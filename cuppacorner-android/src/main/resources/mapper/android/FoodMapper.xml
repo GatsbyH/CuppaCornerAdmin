@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cuppacorner.android.mapper.FoodMapper">
+    
+    <resultMap type="Food" id="FoodResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="imageUrl"    column="imageUrl"    />
+        <result property="detailUrl"    column="detailUrl"    />
+    </resultMap>
+
+    <sql id="selectFoodVo">
+        select id, name, imageUrl, detailUrl from food
+    </sql>
+
+    <select id="selectFoodList" parameterType="Food" resultMap="FoodResult">
+        <include refid="selectFoodVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="imageUrl != null  and imageUrl != ''"> and imageUrl = #{imageUrl}</if>
+            <if test="detailUrl != null  and detailUrl != ''"> and detailUrl = #{detailUrl}</if>
+        </where>
+    </select>
+    
+    <select id="selectFoodById" parameterType="Long" resultMap="FoodResult">
+        <include refid="selectFoodVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFood" parameterType="Food" useGeneratedKeys="true" keyProperty="id">
+        insert into food
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="imageUrl != null">imageUrl,</if>
+            <if test="detailUrl != null">detailUrl,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="imageUrl != null">#{imageUrl},</if>
+            <if test="detailUrl != null">#{detailUrl},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFood" parameterType="Food">
+        update food
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="imageUrl != null">imageUrl = #{imageUrl},</if>
+            <if test="detailUrl != null">detailUrl = #{detailUrl},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFoodById" parameterType="Long">
+        delete from food where id = #{id}
+    </delete>
+
+    <delete id="deleteFoodByIds" parameterType="String">
+        delete from food where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

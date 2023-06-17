@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cuppacorner.android.mapper.NewsMapper">
+
+  <resultMap type="News" id="NewsResult">
+    <result property="id"    column="id"    />
+    <result property="newsTag"    column="news_tag"    />
+    <result property="newsTitle"    column="news_title"    />
+    <result property="newsSummary"    column="news_summary"    />
+    <result property="newsImageurl"    column="news_imageUrl"    />
+    <result property="newsDetailurl"    column="news_detailUrl"    />
+  </resultMap>
+
+  <sql id="selectNewsVo">
+    select id, news_tag, news_title, news_summary, news_imageUrl, news_detailUrl from news
+  </sql>
+
+  <select id="selectNewsList" parameterType="News" resultMap="NewsResult">
+    <include refid="selectNewsVo"/>
+    <where>
+      <if test="newsTag != null  and newsTag != ''"> and news_tag = #{newsTag}</if>
+      <if test="newsTitle != null  and newsTitle != ''"> and news_title = #{newsTitle}</if>
+      <if test="newsSummary != null  and newsSummary != ''"> and news_summary = #{newsSummary}</if>
+      <if test="newsImageurl != null  and newsImageurl != ''"> and news_imageUrl = #{newsImageurl}</if>
+      <if test="newsDetailurl != null  and newsDetailurl != ''"> and news_detailUrl = #{newsDetailurl}</if>
+    </where>
+  </select>
+
+  <select id="selectNewsById" parameterType="Long" resultMap="NewsResult">
+    <include refid="selectNewsVo"/>
+    where id = #{id}
+  </select>
+
+  <insert id="insertNews" parameterType="News" useGeneratedKeys="true" keyProperty="id">
+    insert into news
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="newsTag != null">news_tag,</if>
+      <if test="newsTitle != null">news_title,</if>
+      <if test="newsSummary != null">news_summary,</if>
+      <if test="newsImageurl != null">news_imageUrl,</if>
+      <if test="newsDetailurl != null">news_detailUrl,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="newsTag != null">#{newsTag},</if>
+      <if test="newsTitle != null">#{newsTitle},</if>
+      <if test="newsSummary != null">#{newsSummary},</if>
+      <if test="newsImageurl != null">#{newsImageurl},</if>
+      <if test="newsDetailurl != null">#{newsDetailurl},</if>
+    </trim>
+  </insert>
+
+  <update id="updateNews" parameterType="News">
+    update news
+    <trim prefix="SET" suffixOverrides=",">
+      <if test="newsTag != null">news_tag = #{newsTag},</if>
+      <if test="newsTitle != null">news_title = #{newsTitle},</if>
+      <if test="newsSummary != null">news_summary = #{newsSummary},</if>
+      <if test="newsImageurl != null">news_imageUrl = #{newsImageurl},</if>
+      <if test="newsDetailurl != null">news_detailUrl = #{newsDetailurl},</if>
+    </trim>
+    where id = #{id}
+  </update>
+
+  <delete id="deleteNewsById" parameterType="Long">
+    delete from news where id = #{id}
+  </delete>
+
+  <delete id="deleteNewsByIds" parameterType="String">
+    delete from news where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+</mapper>

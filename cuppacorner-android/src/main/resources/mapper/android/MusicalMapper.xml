@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cuppacorner.android.mapper.MusicalMapper">
+    
+    <resultMap type="Musical" id="MusicalResult">
+        <result property="musicalId"    column="musical_id"    />
+        <result property="musicalName"    column="musical_name"    />
+        <result property="musicalImageurl"    column="musical_imageUrl"    />
+        <result property="musicalDetailurl"    column="musical_detailUrl"    />
+    </resultMap>
+
+    <sql id="selectMusicalVo">
+        select musical_id, musical_name, musical_imageUrl, musical_detailUrl from musical
+    </sql>
+
+    <select id="selectMusicalList" parameterType="Musical" resultMap="MusicalResult">
+        <include refid="selectMusicalVo"/>
+        <where>  
+            <if test="musicalName != null  and musicalName != ''"> and musical_name like concat('%', #{musicalName}, '%')</if>
+            <if test="musicalImageurl != null  and musicalImageurl != ''"> and musical_imageUrl = #{musicalImageurl}</if>
+            <if test="musicalDetailurl != null  and musicalDetailurl != ''"> and musical_detailUrl = #{musicalDetailurl}</if>
+        </where>
+    </select>
+    
+    <select id="selectMusicalByMusicalId" parameterType="Long" resultMap="MusicalResult">
+        <include refid="selectMusicalVo"/>
+        where musical_id = #{musicalId}
+    </select>
+        
+    <insert id="insertMusical" parameterType="Musical" useGeneratedKeys="true" keyProperty="musicalId">
+        insert into musical
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="musicalName != null">musical_name,</if>
+            <if test="musicalImageurl != null">musical_imageUrl,</if>
+            <if test="musicalDetailurl != null">musical_detailUrl,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="musicalName != null">#{musicalName},</if>
+            <if test="musicalImageurl != null">#{musicalImageurl},</if>
+            <if test="musicalDetailurl != null">#{musicalDetailurl},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMusical" parameterType="Musical">
+        update musical
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="musicalName != null">musical_name = #{musicalName},</if>
+            <if test="musicalImageurl != null">musical_imageUrl = #{musicalImageurl},</if>
+            <if test="musicalDetailurl != null">musical_detailUrl = #{musicalDetailurl},</if>
+        </trim>
+        where musical_id = #{musicalId}
+    </update>
+
+    <delete id="deleteMusicalByMusicalId" parameterType="Long">
+        delete from musical where musical_id = #{musicalId}
+    </delete>
+
+    <delete id="deleteMusicalByMusicalIds" parameterType="String">
+        delete from musical where musical_id in 
+        <foreach item="musicalId" collection="array" open="(" separator="," close=")">
+            #{musicalId}
+        </foreach>
+    </delete>
+</mapper>
